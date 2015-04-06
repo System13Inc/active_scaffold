@@ -28,7 +28,7 @@ module ActiveScaffold::Actions
 
     def mark_respond_to_js
       if params[:id]
-        do_search if respond_to? :do_search
+        do_search if respond_to? :do_search, true
         set_includes_for_list_columns
         @page = find_page(:pagination => active_scaffold_config.mark.mark_all_mode != :page)
         render :action => 'on_mark'
@@ -36,7 +36,7 @@ module ActiveScaffold::Actions
         render :action => 'on_mark', :locals => {:checked => mark?}
       end
     end
- 
+
     # We need to give the ActiveRecord classes a handle to currently marked records. We don't want to just pass the object,
     # because the object may change. So we give ActiveRecord a proc that ties to the marked_records_method on this ApplicationController.
     def assign_marked_records_to_model
@@ -70,12 +70,12 @@ module ActiveScaffold::Actions
         each_record_in_scope { |record| record.as_marked = false }
       end
     end
-    
+
     def do_destroy
       super
       @record.as_marked = false if successful?
     end
-    
+
     # The default security delegates to ActiveRecordPermissions.
     # You may override the method to customize.
     def mark_authorized?

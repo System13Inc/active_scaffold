@@ -24,7 +24,7 @@ module ActiveScaffold::Actions
       @nested_auto_open = active_scaffold_config.list.nested_auto_open
       respond_to_action(:list)
     end
-    
+
     protected
     def list_respond_to_html
       if embedded?
@@ -49,11 +49,11 @@ module ActiveScaffold::Actions
     def list_respond_to_yaml
       render :text => Hash.from_xml(response_object.to_xml(:only => list_columns_names)).to_yaml, :content_type => Mime::YAML, :status => response_status
     end
-    
+
     def row_respond_to_html
       render(:partial => 'row', :locals => {:record => @record})
     end
-    
+
     def row_respond_to_js
       render
     end
@@ -64,7 +64,7 @@ module ActiveScaffold::Actions
       includes_for_list_columns = active_scaffold_config.list.columns.collect{ |c| c.includes }.flatten.uniq.compact
       self.active_scaffold_includes.concat includes_for_list_columns
     end
-    
+
     def get_row
       set_includes_for_list_columns
       klass = beginning_of_chain.includes(active_scaffold_includes)
@@ -94,22 +94,23 @@ module ActiveScaffold::Actions
       end
       @page, @records = page, page.items
     end
-    
+
     def do_refresh_list
-      do_search if respond_to? :do_search
+      params.delete(:id)
+      do_search if respond_to? :do_search, true
       do_list
     end
 
     def each_record_in_page
       _page = active_scaffold_config.list.user.page
-      do_search if respond_to? :do_search
+      do_search if respond_to? :do_search, true
       active_scaffold_config.list.user.page = _page
       do_list
       @page.items.each {|record| yield record}
     end
 
     def each_record_in_scope
-      do_search if respond_to? :do_search
+      do_search if respond_to? :do_search, true
       append_to_query(beginning_of_chain, finder_options).all.each {|record| yield record}
     end
 
@@ -174,7 +175,7 @@ module ActiveScaffold::Actions
     def action_update_respond_to_yaml
       render :text => successful? ? "" : Hash.from_xml(response_object.to_xml(:only => list_columns_names)).to_yaml, :content_type => Mime::YAML, :status => response_status
     end
-     
+
     private
     def list_authorized_filter
       raise ActiveScaffold::ActionNotAllowed unless list_authorized?
